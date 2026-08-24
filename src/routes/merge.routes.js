@@ -1,7 +1,9 @@
 const express = require("express");
 
 const upload = require("../middleware/upload.middleware");
+
 const {
+    previewFiles,
     mergeFiles
 } = require("../controllers/merge.controller");
 
@@ -15,12 +17,14 @@ router.get("/test", (req, res) => {
 });
 
 router.post(
-    "/upload",
+    "/preview",
     upload.array("files", 10),
-    (req, res, next) => {
-        req.mergeMode = "append";
-        next();
-    },
+    previewFiles
+);
+
+router.post(
+    "/",
+    upload.array("files", 10),
     mergeFiles
 );
 

@@ -15,10 +15,44 @@ const validateHeaders = (headersList) => {
         throw error;
     }
 
-    const referenceHeaders = headersList[0];
+    headersList.forEach((headers, index) => {
+        if (!headers.length) {
+            const error = new Error(
+                `File ${index + 1} does not contain any columns.`
+            );
+            error.status = 400;
+            throw error;
+        }
+
+        const normalizedHeaders = headers.map(header =>
+            String(header).trim().toLowerCase()
+        );
+
+        if (normalizedHeaders.some(header => !header)) {
+            const error = new Error(
+                `File ${index + 1} contains an empty column name.`
+            );
+            error.status = 400;
+            throw error;
+        }
+
+        if (new Set(normalizedHeaders).size !== normalizedHeaders.length) {
+            const error = new Error(
+                `File ${index + 1} contains duplicate column names.`
+            );
+            error.status = 400;
+            throw error;
+        }
+    });
+
+    const referenceHeaders = headersList[0].map(header =>
+        String(header).trim().toLowerCase()
+    );
 
     for (let i = 1; i < headersList.length; i++) {
-        const currentHeaders = headersList[i];
+        const currentHeaders = headersList[i].map(header =>
+            String(header).trim().toLowerCase()
+        );
 
         if (referenceHeaders.length !== currentHeaders.length) {
             const error = new Error(
@@ -45,4 +79,4 @@ const validateHeaders = (headersList) => {
 module.exports = {
     validateFiles,
     validateHeaders
-};
+}; 
